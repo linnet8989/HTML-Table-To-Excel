@@ -18,9 +18,12 @@ namespace WebApplicationTest
         public TableToExcel()
         {
             sheet = excel.Workbook.Worksheets.Add("sheet1");
+            // horizontal center
             sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            // vertical center
             sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            sheet.Cells.Style.WrapText = true;
+            // cells automatically adapt to the size
+            sheet.Cells.Style.ShrinkToFit = true;
         }
 
         public byte[] process(string html)
@@ -71,16 +74,18 @@ namespace WebApplicationTest
         private void processTable(HtmlElement table)
         {
             int rowIndex = 1;
+            int colIndex, rowSpan, colSpan;
+            float temp;
             if (maxRow > 0)
             {
                 // blank row
-                maxRow += 1;
+                // maxRow += 1;
                 rowIndex = maxRow;
             }
             // Interate Table Rows.
             foreach (HtmlElement row in table.GetElementsByTagName("tr"))
             {
-                int colIndex = 1;
+                colIndex = 1;
                 // Interate Cols.
                 HtmlElementCollection tds = row.GetElementsByTagName("th");
                 if (tds.Count <= 0)
@@ -94,9 +99,15 @@ namespace WebApplicationTest
                     {
                         ++colIndex;
                     }
-                    int rowSpan = getSpan(td.OuterHtml, 0);
-                    int colSpan = getSpan(td.OuterHtml, 1);
+                    rowSpan = getSpan(td.OuterHtml, 0);
+                    colSpan = getSpan(td.OuterHtml, 1);
                     sheet.Cells[rowIndex, colIndex].Value = td.InnerText;
+                    if (float.TryParse(td.InnerText, out temp))
+                    {
+                        sheet.Cells[rowIndex, colIndex].Value = temp;
+                        // reserves two decimal fractions
+                        sheet.Cells[rowIndex, colIndex].Style.Numberformat.Format = "#,##0.00";
+                    }
                     // col span & row span
                     if (colSpan > 1 && rowSpan > 1)
                     {
