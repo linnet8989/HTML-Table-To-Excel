@@ -3,6 +3,7 @@ Convert HTML Table to .xlsx file using EPPlus. EPPlus library only supports .xls
 The TableToExcel class uses EPPlus and Windows.Form. It can convert HTML to bytes array.  
 
 Usage:  
+```csharp
 1. Stream  
 TableToExcel temp = new TableToExcel();  
 Response.BinaryWrite(temp.process(html));  
@@ -13,5 +14,6 @@ using (StreamWriter file = new StreamWriter("C:\\\\temp.xlsx"))
 {  
     file.Write(temp.process(html));  
 }  
+```
 
 P.S. Please solved the problems of WebBrowser by yourself.  
