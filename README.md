@@ -4,13 +4,13 @@ The TableToExcel class uses EPPlus and Windows.Form. It can convert HTML to byte
 
 Usage:  
 ```csharp
-1. Stream  
+//Stream  
 TableToExcel temp = new TableToExcel();  
 Response.BinaryWrite(temp.process(html));  
   
-2. File  
+//File  
 TableToExcel temp = new TableToExcel();  
-using (StreamWriter file = new StreamWriter("C:\\\\temp.xlsx"))  
+using (StreamWriter file = new StreamWriter("C:\\temp.xlsx"))  
 {  
     file.Write(temp.process(html));  
 }  
