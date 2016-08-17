@@ -7,10 +7,10 @@ Usage:
 TableToExcel temp = new TableToExcel();  
 Response.BinaryWrite(temp.process(html));  
 2. File  
-TableToExcel temp = new TableToExcel();
-using (StreamWriter file = new StreamWriter("C:\\temp.xlsx"))
-{
-    file.Write(temp.process(html));
-}
+TableToExcel temp = new TableToExcel();  
+using (StreamWriter file = new StreamWriter("C:\\temp.xlsx"))  
+{  
+    file.Write(temp.process(html));  
+}  
 
 P.S. Please solved the problems of WebBrowser by yourself.  
