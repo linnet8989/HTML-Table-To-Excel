@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
+using System.Xml;
 
 namespace WebApplicationTest
 {
@@ -34,6 +34,11 @@ namespace WebApplicationTest
                 process(html, out stream);
                 return stream.ToArray();
             }
+            catch (Exception ex)
+            {
+                var temp = ex.Message;
+                return null;
+            }
             finally
             {
                 if (stream != null)
@@ -52,14 +57,14 @@ namespace WebApplicationTest
 
         public void process(String html, out MemoryStream output)
         {
-            WebBrowser wb = new WebBrowser();
-            wb.Navigate("about:blank");
-            HtmlDocument doc = wb.Document.OpenNew(true);
-            doc.Write(html);
-            foreach (HtmlElement table in doc.GetElementsByTagName("table"))
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(html);
+            
+            foreach (var table in xml.GetElementsByTagName("table"))
             {
                 processTable(table);
             }
+            
             try
             {
                 output = new MemoryStream();
@@ -71,7 +76,7 @@ namespace WebApplicationTest
             }
         }
 
-        private void processTable(HtmlElement table)
+        private void processTable(dynamic table)
         {
             int rowIndex = 1;
             int colIndex, rowSpan, colSpan;
@@ -83,24 +88,24 @@ namespace WebApplicationTest
                 rowIndex = maxRow;
             }
             // Interate Table Rows.
-            foreach (HtmlElement row in table.GetElementsByTagName("tr"))
+            foreach (var row in table.GetElementsByTagName("tr"))
             {
                 colIndex = 1;
                 // Interate Cols.
-                HtmlElementCollection tds = row.GetElementsByTagName("th");
+                var tds = row.GetElementsByTagName("th");
                 if (tds.Count <= 0)
                 {
                     tds = row.GetElementsByTagName("td");
                 }
-                foreach (HtmlElement td in tds)
+                foreach (var td in tds)
                 {
                     // skip occupied cell
                     while (cellsOccupied.ContainsKey(rowIndex + "_" + colIndex))
                     {
                         ++colIndex;
                     }
-                    rowSpan = getSpan(td.OuterHtml, 0);
-                    colSpan = getSpan(td.OuterHtml, 1);
+                    rowSpan = getSpan(td.OuterXml, 0);
+                    colSpan = getSpan(td.OuterXml, 1);
                     sheet.Cells[rowIndex, colIndex].Value = td.InnerText;
                     if (float.TryParse(td.InnerText, out temp))
                     {
@@ -138,8 +143,8 @@ namespace WebApplicationTest
                     maxRow = rowIndex;
                 }
             }
-        }
-
+        }       
+        
         private void spanRow(int rowIndex, int colIndex, int rowSpan)
         {
             sheet.Cells[rowIndex, colIndex, rowIndex + rowSpan - 1, colIndex].Merge = true;
